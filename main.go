@@ -80,7 +80,6 @@ func main() {
 		Search[firstalbumEntry] = append(Search[firstalbumEntry], entry)
 	}
 
-	fmt.Println(Search)
 	tmpl := template.Must(template.ParseFiles("templates/index3.html"))
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl.Execute(w, artists)
