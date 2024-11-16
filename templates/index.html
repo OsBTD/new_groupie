@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artists</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="content">
+        {{range .}}
+        <div class="artist">
+            <h2 class="name">{{.Name}}</h2>
+            <img src="{{.Image}}" alt="{{.Name}} Image">
+            <p class="members"><strong>Members:</strong> {{.Members}}</p>
+            <p><strong class="creationDate">Creation Date:</strong> {{.CreationDate}}</p>
+            <p><strong class="firstAlbum">First Album:</strong> {{.FirstAlbum}}</p>
+            <p><strong class="relations">Relations:</strong></p>
+            <ul class="locationsList">
+                {{range $location, $dates := .DatesLocations.DatesLocations}}
+                <li class="location"><strong>{{$location}}:</strong>
+                    <ul class="datesList">
+                        {{range $dates}}
+                        <li class="date">{{.}}</li>
+                        {{end}}
+                    </ul>
+                </li>
+                {{end}} 
+            </ul>
+        </div>
+        {{end}}
+    </div>
+</body>
+
+</html>

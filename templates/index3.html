@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artists</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Source Sans 3', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto, auto, 1fr;
+        }
+
+        .Navbar {
+            grid-row: 1;
+        }
+
+        .Title {
+            grid-row: 2;
+        }
+
+        .bottom-section {
+            grid-row: 3;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+
+        /* Left section */
+        .left-section {
+            width: 600px;
+        }
+
+        .cards-container {
+            height: calc((80px + 2rem) * 5 + 1rem);
+            overflow-y: auto;
+            padding-right: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .artist-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1rem;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .artist-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        .artist-thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        /* Right section */
+        .right-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .artist-details {
+            display: none;
+        }
+
+        .artist-details:target {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .artist-details img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .artist-details h2 {
+            font-family: 'Abril Fatface', serif;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .info-section p {
+            margin-bottom: 0.5rem;
+        }
+
+        .info-section strong {
+            color: #555;
+        }
+
+        .locationsList {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .location {
+            margin-bottom: 1rem;
+        }
+
+        .datesList {
+            list-style: none;
+            margin-left: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .date {
+            color: #666;
+            margin: 0.25rem 0;
+        }
+
+        #default-message {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+            font-size: 1.2rem;
+        }
+
+        .artist-details:target~#default-message {
+            display: none;
+        }
+
+        .cards-container::-webkit-scrollbar,
+        .right-section::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .cards-container::-webkit-scrollbar-track,
+        .right-section::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .cards-container::-webkit-scrollbar-thumb,
+        .right-section::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-section">
+        <div class="Navbar">
+            <div class="Menu">
+                <button type="button" class="Home">
+                    <img src="static/assets/Home_Button.svg">
+
+                </button>
+                <button type="button" class="About">
+                    <img src="static/assets/About_Button.svg">
+
+                </button>
+                <button type="button" class="Readme">
+                    <img src="static/assets/Readme_Button.svg">
+                </button>
+
+            </div>
+            <div class="Search">
+                <img src="static/assets/Search_Button.svg">
+
+            </div>
+            <div class="Filter">
+                <img src="static/assets/Filter_Button.svg">
+
+            </div>
+        </div>
+        <div class="Title">
+            <img src="static/assets/Title.svg">
+        </div>
+    </div>
+    <div class="bottom-section">
+        <div class="left-section">
+            <div class="cards-container">
+                {{range .}}
+                <a href="#artist-{{.Name}}" class="artist-card">
+                    <img src="{{.Image}}" alt="{{.Name}}" class="artist-thumbnail">
+                    <div>
+                        <h2>{{.Name}}</h2>
+                        <p>Active since {{.CreationDate}}</p>
+                    </div>
+                </a>
+                {{end}}
+            </div>
+        </div>
+
+        <div class="right-section">
+            {{range .}}
+            <div id="artist-{{.Name}}" class="artist-details">
+                <h2>{{.Name}}</h2>
+                <img src="/static/artist_images/{{.Name}}.png" alt="{{.Name}}">
+                <div class="info-section">
+                    <p><strong>Members:</strong><br>
+                        {{range .Members}}
+                        {{.}}<br>
+                        {{end}}
+                    </p>
+                    <p><strong>First Album:</strong> {{.FirstAlbum}}</p>
+                    <p><strong>Location And Dates:</strong></p>
+                    <ul class="locationsList">
+                        {{range $location, $dates := .DatesLocations.DatesLocations}}
+                        <li class="location">
+                            <strong>{{$location}}:</strong>
+                            <ul class="datesList">
+                                {{range $dates}}
+                                <li class="date">{{.}}</li>
+                                {{end}}
+                            </ul>
+                        </li>
+                        {{end}}
+                    </ul>
+                </div>
+            </div>
+            {{end}}
+            <div id="default-message">Select an artist to view details</div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+<!-- search bar and menu containers fef8eaff  33% opacity  -->
