@@ -58,6 +58,8 @@ func main() {
 			artists[i].DatesLocations = relation
 		}
 	}
+
+	// Build the search index
 	Search := map[string][]Artists{}
 	for _, entry := range artists {
 		nameEntry := strings.ToLower(entry.Name)
@@ -82,8 +84,55 @@ func main() {
 
 	tmpl := template.Must(template.ParseFiles("templates/index3.html"))
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl.Execute(w, artists)
+		query := r.FormValue("query")
+		var filteredArtists []Artists
+		isSearch := false
+
+		if query != "" {
+			isSearch = true
+			query = strings.ToLower(query)
+			resultMap := map[int]Artists{}
+			for key, entries := range Search {
+				if strings.EqualFold(key, query) || strings.Contains(key, query) {
+					for _, entry := range entries {
+						resultMap[entry.ID] = entry
+					}
+				}
+			}
+
+			for _, artist := range resultMap {
+				filteredArtists = append(filteredArtists, artist)
+			}
+		} else {
+			filteredArtists = artists
+		}
+
+		tmpl.Execute(w, struct {
+			IsSearch bool
+			Artists  []Artists
+		}{
+			IsSearch: isSearch,
+			Artists:  filteredArtists,
+		})
 	})
+
+	http.HandleFunc("/suggestions", func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query().Get("query")
+		var suggestions []string
+
+		if query != "" {
+			query = strings.ToLower(query)
+			for key := range Search {
+				if strings.Contains(key, query) {
+					suggestions = append(suggestions, key)
+				}
+			}
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(suggestions)
+	})
+
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("templates"))))
 	fmt.Println("Server started at http://localhost:8080")
 	http.ListenAndServe(":8080", nil)

@@ -17,82 +17,124 @@
     <div class="top-section">
         <div class="Navbar">
             <div class="Menu">
-                <button type="button" class="Home">
+                <button type="button" class="Home" onclick="window.location.href='/'">
                     <img src="static/assets/Home_Button.svg">
-
                 </button>
                 <button type="button" class="About">
                     <img src="static/assets/About_Button.svg">
-
                 </button>
                 <button type="button" class="Readme">
                     <img src="static/assets/Readme_Button.svg">
                 </button>
-
             </div>
-            <div class="Search">
-                <input type="text" placeholder="Search artists..." class="search-input"> <img
-                    src="static/assets/Search_Icon.svg">
-
-            </div>
+            <form action="/" method="get" class="Search">
+                <input type="text" name="query" placeholder="Search artists..." class="search-input" id="search-input">
+                <button type="submit">
+                    <img src="static/assets/Search_Icon.svg">
+                </button>
+            </form>
+            <!-- Suggestions Container -->
+            <div id="suggestions" class="suggestions"></div> 
             <div class="Filter">
                 <img src="static/assets/Filter_Icon.svg">
-
             </div>
         </div>
         <div class="Title">
             <img src="static/assets/Title.svg">
         </div>
     </div>
-    <div class="bottom-section">
-        <div class="left-section">
-            <div class="cards-container">
-                {{range .}}
-                <a href="#artist-{{.Name}}" class="artist-card">
-                    <img src="{{.Image}}" alt="{{.Name}}" class="artist-thumbnail">
-                    <div>
-                        <h2>{{.Name}}</h2>
-                        <p>Active since {{.CreationDate}}</p>
-                    </div>
-                </a>
-                {{end}}
-            </div>
-        </div>
 
-        <div class="right-section">
-            {{range .}}
-            <div id="artist-{{.Name}}" class="artist-details">
-                <h2>{{.Name}}</h2>
-                <img src="/static/artist_images/{{.Name}}.png" alt="{{.Name}}">
-                <div class="info-section">
-                    <p><strong>Members:</strong><br>
-                        {{range .Members}}
-                        {{.}}<br>
-                        {{end}}
-                    </p>
-                    <p><strong>First Album:</strong> {{.FirstAlbum}}</p>
-                    <p><strong>Location And Dates:</strong></p>
-                    <ul class="locationsList">
-                        {{range $location, $dates := .DatesLocations.DatesLocations}}
-                        <li class="location">
-                            <strong>{{$location}}:</strong>
-                            <ul class="datesList">
-                                {{range $dates}}
-                                <li class="date">{{.}}</li>
-                                {{end}}
-                            </ul>
-                        </li>
-                        {{end}}
-                    </ul>
+    <div class="results-section">
+        {{if .IsSearch}}
+        <h1>Search Results</h1>
+        <div class="cards-container">
+            {{range .Artists}}
+            <a href="#artist-{{.Name}}" class="artist-card">
+                <img src="{{.Image}}" alt="{{.Name}}" class="artist-thumbnail">
+                <div>
+                    <h2>{{.Name}}</h2>
+                    <p>Active since {{.CreationDate}}</p>
+                </div>
+            </a>
+            {{else}}
+            <p>No results found for your search.</p>
+            {{end}}
+        </div>
+        {{else}}
+        <div class="bottom-section">
+            <div class="left-section">
+                <div class="cards-container">
+                    {{range .Artists}}
+                    <a href="#artist-{{.Name}}" class="artist-card">
+                        <img src="{{.Image}}" alt="{{.Name}}" class="artist-thumbnail">
+                        <div>
+                            <h2>{{.Name}}</h2>
+                            <p>Active since {{.CreationDate}}</p>
+                        </div>
+                    </a>
+                    {{end}}
                 </div>
             </div>
-            {{end}}
-            <div id="default-message">Select an artist to view details</div>
+
+            <div class="right-section">
+                {{range .Artists}}
+                <div id="artist-{{.Name}}" class="artist-details">
+                    <h2>{{.Name}}</h2>
+                    <img src="/static/artist_images/{{.Name}}.png" alt="{{.Name}}">
+                    <div class="info-section">
+                        <p><strong>Members:</strong><br>
+                            {{range .Members}}
+                            {{.}}<br>
+                            {{end}}
+                        </p>
+                        <p><strong>First Album:</strong> {{.FirstAlbum}}</p>
+                        <p><strong>Location And Dates:</strong></p>
+                        <ul class="locationsList">
+                            {{range $location, $dates := .DatesLocations.DatesLocations}}
+                            <li class="location">
+                                <strong>{{$location}}:</strong>
+                                <ul class="datesList">
+                                    {{range $dates}}
+                                    <li class="date">{{.}}</li>
+                                    {{end}}
+                                </ul>
+                            </li>
+                            {{end}}
+                        </ul>
+                    </div>
+                </div>
+                {{end}}
+                <div id="default-message">Select an artist to view details</div>
+            </div>
         </div>
+        {{end}}
     </div>
 
+    <script>
+        document.getElementById('search-input').addEventListener('input', function () {
+            let query = this.value;
+            if (query.length > 2) {
+                fetch(`/suggestions?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let suggestionsContainer = document.getElementById('suggestions');
+                        suggestionsContainer.innerHTML = '';
+                        data.forEach(suggestion => {
+                            let div = document.createElement('div');
+                            div.textContent = suggestion;
+                            div.classList.add('suggestion-item');
+                            div.onclick = function () {
+                                document.getElementById('search-input').value = suggestion;
+                                suggestionsContainer.innerHTML = '';
+                            };
+                            suggestionsContainer.appendChild(div);
+                        });
+                    });
+            } else {
+                document.getElementById('suggestions').innerHTML = '';
+            }
+        });
+    </script>
 </body>
 
 </html>
-
-<!-- search bar and menu containers fef8eaff  33% opacity  -->
